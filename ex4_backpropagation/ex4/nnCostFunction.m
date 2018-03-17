@@ -75,21 +75,26 @@ z2 = a1 * Theta1';
 a2 = [ones(m, 1), sigmoid(z2)];
 z3 = a2 * Theta2';
 a3 = sigmoid(z3);
-%cost
+
 J = 1/m * sum(sum(-Y .* log(a3) - (1-Y) .* log(1-a3)));
-
-% Part 3: Regularization
-
-J = J + lambda/(2*m) * sum(sum(Theta1(:, 2:end).^2)); % exclude bias
-J = J + lambda/(2*m) * sum(sum(Theta2(:, 2:end).^2)); % exclude bias
 
 % Part 2: Backpropagation
 
+DeltaOutput = a3 - Y;
+DeltaHidden = (Theta2' * DeltaOutput')' .* [ones(m, 1), sigmoidGradient(z2)];
 
+Theta2_grad = 1/m * DeltaOutput' * a2;
+Theta1_grad = 1/m * DeltaHidden(:, 2:end)' * a1;
 
+% Part 3: Regularization
 
+% cost function
+J = J + lambda/(2*m) * sum(sum(Theta1(:, 2:end).^2)); % exclude bias
+J = J + lambda/(2*m) * sum(sum(Theta2(:, 2:end).^2)); % exclude bias
 
-% -------------------------------------------------------------
+% gradient
+Theta1_grad(:, 2:end) = Theta1_grad(:, 2:end) + lambda/m * Theta1(:, 2:end);
+Theta2_grad(:, 2:end) = Theta2_grad(:, 2:end) + lambda/m * Theta2(:, 2:end);
 
 % =========================================================================
 
