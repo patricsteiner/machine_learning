@@ -19,20 +19,20 @@ normalizedFeatures = normalizeFeatures(features);
 %% 2) and 3) Linear regression for price / log(price) using sqft_living
 m = size(features, 1); % number of training samples
 X = [ones(m, 1), normalizedFeatures(:, 3)]; % feature matrix with an added column of 1s (column 3 is sqft_living)
-y = labels; % use log(labels) for 3)
+y = log(labels); % use log(labels) for 3)
 theta = zeros(2, 1); % initial parameters (weights)
 alpha = 0.1; % learning rate
 num_iters = 100;
 [theta, J_history] = gradientDescent(X, y, theta, alpha, num_iters);
 
-% visualize gradient descent
+% Visualize gradient descent
 figure;
 plot(1:num_iters, J_history);
 title('Gradient descent visualization');
 xlabel('number of iterations');
 ylabel('cost');
 
-% visualize regression line and features
+% Visualize regression line and features
 figure;
 scatter(X(:, 2), y, 1, '.');
 hold on;
@@ -63,18 +63,54 @@ ylabel('frequency');
 
 %% 4) mean absolute percentage error
 [m, dist] = mape(X * theta, y);
+figure;
 histogram(dist, 50);
 title('MAPE distribution histogram');
 xlabel('percentage error');
 ylabel('frequency');
 
-%% 5) Visuzize house prices by latitude and longtitude
-scatter3(features(:, 15), features(:, 16), labels, 10, labels, 'filled');
+%% 5) Visualize house prices by latitude and longtitude
+figure;
+scatter(features(:, 15), features(:, 16), 10, y, 'filled');
 colormap(jet);
-colorbar;
+c = colorbar;
+c.Label.String = 'log(price)';
 title('House prices by latitude and longtitude');
 xlabel(featureTitles(15));
 ylabel(featureTitles(16));
-zlabel('price');
 
+%% 6) Visualize zipcode by latitude and longtitude
+figure;
+scatter(features(:, 15), features(:, 16), 10, features(:, 14), 'filled');
+colormap(hsv);
+c = colorbar;
+c.Label.String = featureTitles(14);
+title('Zipcode by latitude and longtitude');
+xlabel(featureTitles(15));
+ylabel(featureTitles(16));
+
+%% 7) One hot encode zipcode and use as additional feature for linear regression
+m = size(features, 1); % number of training samples
+X = [ones(m, 1), normalizedFeatures(:, 3), onehotEncode(features(:, 14))]; % feature matrix with an added column of 1s (column 3 is sqft_living, 14 is zipcode)
+y = log(labels);
+theta = zeros(72, 1); % initial parameters (weights)
+alpha = 0.1; % learning rate
+num_iters = 100;
+[theta, J_history] = gradientDescent(X, y, theta, alpha, num_iters);
+
+%% 8) Use even more features
+m = size(features, 1); % number of training samples
+X = [ones(m, 1), ...              
+    normalizedFeatures(:, 1), ...
+    normalizedFeatures(:, 2), ...
+    normalizedFeatures(:, 3), ...
+    normalizedFeatures(:, 9), ...
+    onehotEncode(features(:, 12)), ...
+    onehotEncode(features(:, 14))
+    ]; % feature matrix
+y = log(labels);
+theta = zeros(size(X, 2), 1); % initial parameters (weights)
+alpha = 0.1; % learning rate
+num_iters = 100;
+[theta, J_history] = gradientDescent(X, y, theta, alpha, num_iters);
 
