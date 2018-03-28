@@ -33,13 +33,14 @@ ylabel('frequency');
 
 disp('press any key to continue...'); pause; close all;
 
-%% 1.5) Feature scaling (standardization) to avoid overflows and speed up gradient descent
+%% 1.2) Feature scaling (standardization) to avoid overflows and speed up gradient descent, split data
 normalizedFeatures = normalizeFeatures(features);
+[Xtrain, Xtest, ytrain, ytest] = trainTestSplit(normalizedFeatures, labels);
 
 %% 2) and 3) Linear regression for price / log(price) using sqft_living
-m = size(features, 1); % number of training samples
-X = [ones(m, 1), normalizedFeatures(:, 3)]; % feature matrix with an added column of 1s (column 3 is sqft_living)
-y = log(labels); % change to log(labels) for 3)
+m = length(ytrain); % number of training samples
+X = [ones(m, 1), Xtrain(:, 3)]; % feature matrix with an added column of 1s (column 3 is sqft_living)
+y = log(ytrain); % change to log(ytrain) for 3)+
 theta = zeros(2, 1); % initial parameters (weights)
 alpha = 0.1; % learning rate
 num_iters = 100;
@@ -66,6 +67,9 @@ hold off;
 % Turkey-Anscombe plot and histogram
 figure;
 subplot(2, 1, 1);
+m = length(ytest); % number of training samples
+X = [ones(m, 1), Xtest(:, 3)]; % feature matrix with an added column of 1s (column 3 is sqft_living)
+y = log(ytest); % change to log(ytest) for 3)+
 residuals = y - X * theta; % residuals = actual values - predictions
 plot(X(:, 2), residuals, '.b', 'MarkerSize', 0.5);
 hold on;
@@ -86,7 +90,7 @@ sprintf('residuals: mean=%f, std=%f, var=%f', mean(residuals), std(residuals), v
 disp('press any key to continue...'); pause; close all;
 
 %% 4) mean absolute percentage error
-[m, dist] = mape(X, y, theta);
+[~, dist] = mape(X, y, theta);
 figure;
 histogram(dist, 50);
 title('MAPE distribution histogram');
@@ -97,17 +101,16 @@ disp('press any key to continue...'); pause; close all;
 
 %% 5) Visualize house prices by latitude and longtitude
 figure;
-scatter3(features(:, 16), features(:, 15), y, 10, y, 'filled');
+scatter(features(:, 16), features(:, 15), 10, log(labels), 'filled');
 colormap(jet);
 c = colorbar;
 c.Label.String = 'log(price)';
 title('House prices by latitude and longtitude');
 xlabel(featureTitles(16));
 ylabel(featureTitles(15));
-zlabel('log(price)')
 
 %% 6) Visualize zipcode by latitude and longtitude
-
+figure;
 scatter(features(:, 16), features(:, 15), 10, features(:, 14), 'filled');
 colormap(hsv);
 c = colorbar;
@@ -116,29 +119,84 @@ title('Zipcode by latitude and longtitude');
 xlabel(featureTitles(16));
 ylabel(featureTitles(15));
 
+disp('press any key to continue...'); pause; close all;
+
 %% 7) One hot encode zipcode and use as additional feature for linear regression
-m = size(features, 1); % number of training samples
-X = [ones(m, 1), normalizedFeatures(:, 3), onehotEncode(features(:, 14))]; % feature matrix with an added column of 1s (column 3 is sqft_living, 14 is zipcode)
-y = log(labels);
+m = length(ytrain); % number of training samples
+X = [ones(m, 1), Xtrain(:, 3), onehotEncode(Xtrain(:, 14))]; % feature matrix with an added column of 1s (column 3 is sqft_living, 14 is zipcode)
+y = log(ytrain);
 theta = zeros(size(X, 2), 1); % initial parameters (weights)
 alpha = 0.1; % learning rate
 num_iters = 100;
 [theta, J_history] = gradientDescent(X, y, theta, alpha, num_iters);
-% now manually call the visualization code parts above if you want to visualize this too
+
+% Turkey-Anscombe plot and histogram
+figure;
+subplot(2, 1, 1);
+m = length(ytest); % number of training samples
+X = [ones(m, 1), Xtest(:, 3), onehotEncode(Xtest(:, 14))]; % feature matrix with an added column of 1s (column 3 is sqft_living, 14 is zipcode)
+y = log(ytest);
+residuals = y - X * theta; % residuals = actual values - predictions
+plot(X(:, 2), residuals, '.b', 'MarkerSize', 0.5);
+hold on;
+plot(xlim(), [0, 0], '-r', 'LineWidth', 1);
+legend('Difference to prediction', '0 line');
+title('Tukey-Anscombe plot');
+xlabel('sqft living');
+ylabel('residuals');
+hold off;
+subplot(2, 1, 2);
+histogram(residuals, 50);
+title('Tukey-Anscombe histogram');
+xlabel('residuals');
+ylabel('frequency');
+
+sprintf('residuals: mean=%f, std=%f, var=%f', mean(residuals), std(residuals), var(residuals))
+
+disp('press any key to continue...'); pause; close all;
 
 %% 8) Use even more features
-m = size(features, 1); % number of training samples
+m = length(ytrain); % number of training samples
 X = [ones(m, 1), ...              
-    normalizedFeatures(:, 3), ...
-    normalizedFeatures(:, 1), ...
-    normalizedFeatures(:, 2), ...
-    normalizedFeatures(:, 9), ...
-    onehotEncode(features(:, 12)), ...
-    onehotEncode(features(:, 14))
+    Xtrain(:, 3), ...
+    Xtrain(:, 1), ...
+    Xtrain(:, 2), ...
+    Xtrain(:, 9), ...
+    onehotEncode(Xtrain(:, 12)), ...
+    onehotEncode(Xtrain(:, 14))
     ]; % feature matrix
-y = log(labels);
+y = log(ytrain);
 theta = zeros(size(X, 2), 1); % initial parameters (weights)
 alpha = 0.1; % learning rate
 num_iters = 100;
 [theta, J_history] = gradientDescent(X, y, theta, alpha, num_iters);
-% now manually call the visualization code parts above if you want to visualize this too
+
+% Turkey-Anscombe plot and histogram
+figure;
+subplot(2, 1, 1);
+m = length(ytest); % number of training samples
+X = [ones(m, 1), ...              
+    Xtest(:, 3), ...
+    Xtest(:, 1), ...
+    Xtest(:, 2), ...
+    Xtest(:, 9), ...
+    onehotEncode(Xtest(:, 12)), ...
+    onehotEncode(Xtest(:, 14))
+    ]; % feature matrix
+y = log(ytest);
+residuals = y - X * theta; % residuals = actual values - predictions
+plot(X(:, 2), residuals, '.b', 'MarkerSize', 0.5);
+hold on;
+plot(xlim(), [0, 0], '-r', 'LineWidth', 1);
+legend('Difference to prediction', '0 line');
+title('Tukey-Anscombe plot');
+xlabel('sqft living');
+ylabel('residuals');
+hold off;
+subplot(2, 1, 2);
+histogram(residuals, 50);
+title('Tukey-Anscombe histogram');
+xlabel('residuals');
+ylabel('frequency');
+
+sprintf('residuals: mean=%f, std=%f, var=%f', mean(residuals), std(residuals), var(residuals))
