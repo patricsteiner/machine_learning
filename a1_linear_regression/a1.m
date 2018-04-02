@@ -14,7 +14,18 @@ for i = 1:length(featureTitles)
 end
 set(gcf, 'Position', [200, 200, 1000, 800]);
 
-%% 1.1) Visualize skewness of data
+figure('Name', 'Histograms of features');
+for i = 1:length(featureTitles)
+    subplot(6, 3, i);
+    s = histogram(features(:, i));
+    ylabel('frequency');
+    xlabel(featureTitles(i));
+end
+set(gcf, 'Position', [400, 200, 1000, 800]);
+
+disp('press any key to continue...'); pause; close all;
+
+% Visualize skewness of data
 figure;
 histogram(labels);
 title('price histogram');
@@ -33,9 +44,11 @@ ylabel('frequency');
 
 disp('press any key to continue...'); pause; close all;
 
-%% 1.2) Feature scaling (standardization) to avoid overflows and speed up gradient descent, split data
+%% 1.1) Feature scaling (standardization) to avoid overflows and speed up gradient descent, split data
 normalizedFeatures = normalizeFeatures(features);
-[Xtrain, Xtest, ytrain, ytest] = trainTestSplit(normalizedFeatures, labels);
+
+%% 1.2) Split data to training and test set (80%/20%)
+[Xtrain, Xtest, ytrain, ytest] = trainTestSplit(normalizedFeatures, labels, 0.8);
 
 %% 2) and 3) Linear regression for price / log(price) using sqft_living
 m = length(ytrain); % number of training samples
@@ -67,9 +80,6 @@ hold off;
 % Turkey-Anscombe plot and histogram
 figure;
 subplot(2, 1, 1);
-m = length(ytest); % number of training samples
-X = [ones(m, 1), Xtest(:, 3)]; % feature matrix with an added column of 1s (column 3 is sqft_living)
-y = log(ytest); % change to log(ytest) for 3)+
 residuals = y - X * theta; % residuals = actual values - predictions
 plot(X(:, 2), residuals, '.b', 'MarkerSize', 0.5);
 hold on;

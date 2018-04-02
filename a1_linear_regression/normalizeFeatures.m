@@ -1,6 +1,5 @@
 function normalizedFeatures = normalizeFeatures(features)
-%NORMALIZEFEATURES Scale and features to avoid overflows and speed up
-%gradient descent
+%NORMALIZEFEATURES Scale and features to avoid overflows and speed up gradient descent
 
 normalizedFeatures = zeros(size(features));
 
