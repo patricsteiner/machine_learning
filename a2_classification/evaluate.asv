@@ -1,0 +1,25 @@
+function evaluate(predicted, actual)
+%EVALUATE 
+
+tp = sum(predicted & actual);
+fp = sum(predicted & ~actual);
+tn = sum(~predicted & ~actual);
+fn = sum(~predicted & actual);
+precision = tp / (tp + fp);
+recall = tp / (tp + fn);
+accuracy = (tp + tn) / (tp + fp + tn + fn);
+fscore = 2 * (precision * recall) / (precision + recall);
+
+fprintf('Confusion Matrix\n');
+fprintf('-------------\n');
+fprintf('|%5d|%5d|\n', tp, fp);
+fprintf('|-----------|\n');
+fprintf('|%- 5d|%5d|\n', tn, fn);
+fprintf('-------------\n\n');
+fprintf('Accuracy:\t%d\n', accuracy);
+fprintf('Precision:\t%d\n', precision);
+fprintf('Recall:\t%d\n', recall);
+fprintf('F-Score:\t%d\n', fscore);
+
+end
+
