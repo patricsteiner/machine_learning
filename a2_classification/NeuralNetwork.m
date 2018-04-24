@@ -46,8 +46,10 @@ classdef NeuralNetwork
         function obj = train(obj, X, y, alpha, n_iterations)
             %TRAIN trains the NN using backpropagation
             %you need to init the weights first!
+            errorHistory = zeros(n_iterations, 1);
             for iter = 1:n_iterations
                 obj = obj.forwardPropagate(X);
+                errorHistory(iter) = mean((obj.predict(X) - y).^2);
                 %backpropagate
                 delta = obj.layers(end).activated - y;
                 for i = length(obj.layers)-1:-1:1
@@ -67,6 +69,11 @@ classdef NeuralNetwork
                     delta = delta * obj.layers(i).weights .* derivedValues;
                 end
             end
+            figure;
+            plot(1:n_iterations, errorHistory);
+            title('Neural Network Gradient Descent');
+            xlabel('iteration');
+            ylabel('error (MSE)');
         end
         
         function p = predict(obj, X)

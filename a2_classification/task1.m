@@ -1,6 +1,6 @@
 close all; clc;
 %the first two columns of the csv file (id and date) were removed
-%beforehand to make it easier to load
+%beforehand to make it easier to load/read
 [features_train, labels_train, featureTitles] = loadCSVData('house_train_data.csv', 7); %col 7 is waterfront (label)
 [features_test, labels_test, featureTitles] = loadCSVData('house_test_data.csv', 7);
 
