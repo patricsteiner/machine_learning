@@ -13,7 +13,7 @@ y = labels;
 initialTheta = zeros(1, size(X, 2)); %weights
 
 alpha = 1; %learning rate
-n_iters = 100;
+n_iters = 500;
 bestFscore = 0;
 bestLambda = 0;
 bestTheta = initialTheta;

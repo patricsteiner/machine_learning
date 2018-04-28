@@ -49,9 +49,10 @@ classdef NeuralNetwork
             errorHistory = zeros(n_iterations, 1);
             for iter = 1:n_iterations
                 obj = obj.forwardPropagate(X);
-                errorHistory(iter) = mean((obj.predict(X) - y).^2);
                 %backpropagate
                 delta = obj.layers(end).activated - y;
+                cost = logCost(obj.layers(end-1).activated, obj.layers(end-1).weights, y, 0); 
+                errorHistory(iter) = cost;
                 for i = length(obj.layers)-1:-1:1
                     nextLayer = obj.layers(i+1);
                     %calculate gradient
@@ -59,6 +60,7 @@ classdef NeuralNetwork
                         delta = delta(:, 2:end);
                     end
                     weightsGradient = 1/size(X, 1) * delta' * obj.layers(i).activated;
+                    %gradCheck = computeNumericalGradient(@logCost, obj.layers(i).weights);
                     %update weights
                     obj.layers(i).weights = obj.layers(i).weights - alpha * weightsGradient;
                     %calculate delta
@@ -73,7 +75,7 @@ classdef NeuralNetwork
             plot(1:n_iterations, errorHistory);
             title('Neural Network Gradient Descent');
             xlabel('iteration');
-            ylabel('error (MSE)');
+            ylabel('error (log loss)');
         end
         
         function p = predict(obj, X)
