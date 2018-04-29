@@ -43,23 +43,24 @@ classdef NeuralNetwork
             end
         end
         
-        function obj = train(obj, X, y, alpha, n_iterations)
+        function obj = train(obj, X, y, alpha, lambda, n_iterations)
             %TRAIN trains the NN using backpropagation
             %you need to init the weights first!
+            m = size(X, 1);
             errorHistory = zeros(n_iterations, 1);
             for iter = 1:n_iterations
                 obj = obj.forwardPropagate(X);
                 %backpropagate
                 delta = obj.layers(end).activated - y;
-                cost = logCost(obj.layers(end-1).activated, obj.layers(end-1).weights, y, 0); 
-                errorHistory(iter) = cost;
+                cost = 1/m * sum(sum(-y .* log(obj.layers(end).activated) - (1-y) .* log(1-obj.layers(end).activated)));
                 for i = length(obj.layers)-1:-1:1
                     nextLayer = obj.layers(i+1);
                     %calculate gradient
                     if nextLayer.hasBias
                         delta = delta(:, 2:end);
                     end
-                    weightsGradient = 1/size(X, 1) * delta' * obj.layers(i).activated;
+                    weightsGradient = 1/m * delta' * obj.layers(i).activated; %TODO is nnext line right?
+                    weightsGradient(:, 2:end) = weightsGradient(:, 2:end) + lambda/m * obj.layers(i).weights(:, 2:end); %regularization (exluding bias)
                     %gradCheck = computeNumericalGradient(@logCost, obj.layers(i).weights);
                     %update weights
                     obj.layers(i).weights = obj.layers(i).weights - alpha * weightsGradient;
@@ -69,7 +70,10 @@ classdef NeuralNetwork
                         derivedValues = [ones(size(derivedValues, 1), 1), derivedValues];
                     end
                     delta = delta * obj.layers(i).weights .* derivedValues;
+                    %cost = cost + lambda/(2*m) * sum(sum(obj.layers(i).weights(:, 2:end).^2)); %regularization (excluding bias)
                 end
+                errorHistory(iter) = cost;
+                cost
             end
             figure;
             plot(1:n_iterations, errorHistory);
