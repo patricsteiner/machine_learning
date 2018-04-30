@@ -59,9 +59,10 @@ classdef NeuralNetwork
                     if nextLayer.hasBias
                         delta = delta(:, 2:end);
                     end
-                    weightsGradient = 1/m * delta' * obj.layers(i).activated; %TODO is nnext line right?
-                    weightsGradient(:, 2:end) = weightsGradient(:, 2:end) + lambda/m * obj.layers(i).weights(:, 2:end); %regularization (exluding bias)
-                    %gradCheck = computeNumericalGradient(@logCost, obj.layers(i).weights);
+                    weightsGradient = 1/m * delta' * obj.layers(i).activated;
+                    %regularization (excluding bias)
+                    cost = cost + lambda/(2*m) * sum(sum(obj.layers(i).weights(:, 2:end).^2)); 
+                    weightsGradient(:, 2:end) = weightsGradient(:, 2:end) + lambda/m * obj.layers(i).weights(:, 2:end);
                     %update weights
                     obj.layers(i).weights = obj.layers(i).weights - alpha * weightsGradient;
                     %calculate delta
@@ -69,8 +70,7 @@ classdef NeuralNetwork
                     if (obj.layers(i).hasBias) 
                         derivedValues = [ones(size(derivedValues, 1), 1), derivedValues];
                     end
-                    delta = delta * obj.layers(i).weights .* derivedValues;
-                    %cost = cost + lambda/(2*m) * sum(sum(obj.layers(i).weights(:, 2:end).^2)); %regularization (excluding bias)
+                    delta = delta * obj.layers(i).weights .* derivedValues;      
                 end
                 errorHistory(iter) = cost;
                 cost

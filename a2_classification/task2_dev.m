@@ -18,9 +18,9 @@ nn = NeuralNetwork(inputLayer, outputLayer);
 %nn = nn.addLayer(Layer(size(X, 2)*10, true, @sigmoid));
 %nn = nn.addLayer(Layer(size(X, 2)*5, true, @sigmoid));
 nn = nn.initWeights(-1, 1);
-alpha = .5; %learning rate
-lambda = 1; %regularization parameter
-n_iters = 10000;
+alpha = 1; %learning rate
+lambda = 0; %regularization parameter
+n_iters = 1000;
 nn = nn.train(Xtrain, ytrain, alpha, lambda, n_iters);
 
 predicted = nn.predict(Xtest);
