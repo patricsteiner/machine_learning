@@ -94,7 +94,7 @@ ylabel('loss');
 
 %% fit model using best parameters and evaluate it
 lambda = 0; % regularization parameter, set according to best lambda found in plot before
-[theta, costHistory] = gradientDescent(Xtrain, ytrain, initialTheta, alpha, lambda, 100000, true); 
+[theta, costHistory] = gradientDescent(X, y, initialTheta, alpha, lambda, n_iters, true); 
 
 fprintf('Evaluation on training set:\n');
 evaluate(predict(Xtrain, theta, true), ytrain, true);
