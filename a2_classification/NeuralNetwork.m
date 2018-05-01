@@ -43,7 +43,11 @@ classdef NeuralNetwork
             end
         end
         
-        function obj = train(obj, X, y, alpha, lambda, n_iterations)
+        function cost = cost(~, predicted, actual)
+            cost = 1/size(predicted, 1) * sum(sum(-actual .* log(predicted) - (1-actual) .* log(1-predicted)));
+        end
+        
+        function obj = train(obj, X, y, alpha, lambda, n_iterations, visualize)
             %TRAIN trains the NN using backpropagation
             %you need to init the weights first!
             m = size(X, 1);
@@ -52,7 +56,7 @@ classdef NeuralNetwork
                 obj = obj.forwardPropagate(X);
                 %backpropagate
                 delta = obj.layers(end).activated - y;
-                cost = 1/m * sum(sum(-y .* log(obj.layers(end).activated) - (1-y) .* log(1-obj.layers(end).activated)));
+                cost = obj.cost(obj.layers(end).activated, y);
                 for i = length(obj.layers)-1:-1:1
                     nextLayer = obj.layers(i+1);
                     %calculate gradient
@@ -73,18 +77,25 @@ classdef NeuralNetwork
                     delta = delta * obj.layers(i).weights .* derivedValues;      
                 end
                 errorHistory(iter) = cost;
-                cost
+                if (mod(iter, 100) == 0)
+                    disp(cost);
+                end
             end
-            figure;
-            plot(1:n_iterations, errorHistory);
-            title('Neural Network Gradient Descent');
-            xlabel('iteration');
-            ylabel('error (log loss)');
+            if visualize
+                figure;
+                plot(1:n_iterations, errorHistory);
+                title('Neural Network Gradient Descent');
+                xlabel('iteration');
+                ylabel('error (log loss)');
+            end
         end
         
-        function p = predict(obj, X)
+        function p = predict(obj, X, binary)
         	obj = obj.forwardPropagate(X);
             p = obj.layers(end).activated;
+            if binary
+                p = p >= .5;
+            end
         end
     end
 end
