@@ -1,18 +1,20 @@
-function [theta, J_history] = gradientDescent(X, y, theta, alpha, lambda, n_iters)
+function [theta, costHistory] = gradientDescent(X, y, theta, alpha, lambda, n_iters, visualize)
 %GRADIENTDESCENT Performs gradient descent to learn optimal theta values
 
-J_history = zeros(n_iters, 1);
+costHistory = zeros(n_iters, 1);
 
 for i = 1:n_iters
-    [J, grad] = logCost(X, theta, y, lambda);
-    J_history(i) = J;
+    [cost, grad] = logCost(X, theta, y, lambda);
+    costHistory(i) = cost;
     theta = theta - alpha * grad;
 end
 
-figure;
-plot(1:n_iters, J_history);
-title('Gradient descent');
-xlabel('iteration');
-ylabel('logCost');
+if visualize
+    figure;
+    plot(1:n_iters, costHistory);
+    title('Gradient descent');
+    xlabel('iteration');
+    ylabel('logCost');
+end
 
 end
