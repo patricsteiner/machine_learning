@@ -51,7 +51,6 @@ nn = nn.train(Xtrain, ytrain, alpha, lambda, n_iters, true);
 %% evaluate
 predicted = nn.predict(Xtest, true);
 evaluate(predicted, ytest, true);
-mean((predicted - ytest).^2);
 
 
 

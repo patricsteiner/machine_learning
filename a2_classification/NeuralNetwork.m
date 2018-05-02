@@ -43,11 +43,11 @@ classdef NeuralNetwork
             end
         end
         
-        function cost = cost(~, predicted, actual)
+        function cost = logCost(~, predicted, actual)
             cost = 1/size(predicted, 1) * sum(sum(-actual .* log(predicted) - (1-actual) .* log(1-predicted)));
         end
         
-        function obj = train(obj, X, y, alpha, lambda, n_iterations, visualize)
+        function obj = train(obj, X, Y, alpha, lambda, n_iterations, visualize)
             %TRAIN trains the NN using backpropagation
             %you need to init the weights first!
             m = size(X, 1);
@@ -55,12 +55,11 @@ classdef NeuralNetwork
             for iter = 1:n_iterations
                 obj = obj.forwardPropagate(X);
                 %backpropagate
-                delta = obj.layers(end).activated - y;
-                cost = obj.cost(obj.layers(end).activated, y);
+                delta = obj.layers(end).activated - Y;
+                cost = obj.logCost(obj.layers(end).activated, Y);
                 for i = length(obj.layers)-1:-1:1
-                    nextLayer = obj.layers(i+1);
                     %calculate gradient
-                    if nextLayer.hasBias
+                    if obj.layers(i+1).hasBias
                         delta = delta(:, 2:end);
                     end
                     weightsGradient = 1/m * delta' * obj.layers(i).activated;
@@ -77,7 +76,7 @@ classdef NeuralNetwork
                     delta = delta * obj.layers(i).weights .* derivedValues;      
                 end
                 errorHistory(iter) = cost;
-                if (mod(iter, 100) == 0)
+                if (mod(iter, 10) == 0)
                     disp(cost);
                 end
             end
@@ -90,11 +89,13 @@ classdef NeuralNetwork
             end
         end
         
-        function p = predict(obj, X, binary)
+        function p = predict(obj, X, binary) 
+            % assumes multiclass with sigmoid output. when binary, returns
+            % the highest output as 1 and all others as 0.
         	obj = obj.forwardPropagate(X);
             p = obj.layers(end).activated;
             if binary
-                p = p >= .5;
+                p = double(p == max(p, [], 2)); 
             end
         end
     end

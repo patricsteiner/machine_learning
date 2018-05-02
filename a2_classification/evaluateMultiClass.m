@@ -4,15 +4,15 @@ function fscore = evaluateMultiClass(predicted, actual, print)
 
 confusionMatrix = zeros(size(predicted, 2));
 for n = 1:size(predicted, 1)
-    i = find(predicted == 1);
-    j = find(actual == 1);
+    i = find(actual(n, :) == 1);
+    j = find(predicted(n, :) == 1);
 	confusionMatrix(i, j) = confusionMatrix(i, j) + 1;
 end
     
-tp = sum(predicted & actual);
-fp = sum(predicted & ~actual);
-tn = sum(~predicted & ~actual);
-fn = sum(~predicted & actual);
+tp = sum(sum(predicted & actual));
+fp = sum(sum(predicted & ~actual));
+tn = sum(sum(~predicted & ~actual));
+fn = sum(sum(~predicted & actual));
 precision = tp / (tp + fp);
 recall = tp / (tp + fn);
 accuracy = (tp + tn) / (tp + fp + tn + fn);
