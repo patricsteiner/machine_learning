@@ -33,9 +33,9 @@ testLoss = [];
 for lambda = lambdaValues  % visualize results using different lambdas
     nn = nn.initWeights(-1, 1);
     nn = nn.train(Xtrain, ytrain, alpha, lambda, n_iters, true);
-    trainLoss = [trainLoss, nn.cost(nn.predict(Xtrain, false), ytrain)];
-    valLoss = [valLoss, nn.cost(nn.predict(Xval, false), yval)];
-    testLoss = [testLoss, nn.cost(nn.predict(Xtest, false), ytest)];
+    trainLoss = [trainLoss, nn.logCost(nn.predict(Xtrain, false), ytrain)];
+    valLoss = [valLoss, nn.logCost(nn.predict(Xval, false), yval)];
+    testLoss = [testLoss, nn.logCost(nn.predict(Xtest, false), ytest)];
 end
 figure;
 plot(lambdaValues, trainLoss, lambdaValues, valLoss, lambdaValues, testLoss);

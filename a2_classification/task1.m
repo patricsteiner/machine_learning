@@ -75,22 +75,22 @@ ytest = labels_test;
 initialTheta = zeros(1, size(X, 2)); %weights
 alpha = 20; %learning rate
 n_iters = 10000;
-lambdaValues = [0 0.0001 0.0003 0.001 0.003 0.01 0.03 0.1 0.3 1 3 10 30 100];
-trainLoss = [];
-valLoss = [];
-testLoss = [];
-for lambda = lambdaValues  % visualize results using different lambdas
-    [theta, costHistory] = gradientDescent(Xtrain, ytrain, initialTheta, alpha, lambda, n_iters, true);
-    trainLoss = [trainLoss, logCost(Xtrain, theta, ytrain, 0)]; % use lambda=0 here because we want the bare cost
-    valLoss = [valLoss, logCost(Xval, theta, yval, 0)]; % dito
-    testLoss = [testLoss, logCost(Xtest, theta, ytest, 0)]; % dito
-end
-figure;
-plot(lambdaValues, trainLoss, lambdaValues, valLoss, lambdaValues, testLoss);
-legend('Training loss', 'Validation loss', 'Test loss');
-title('Choosing lambda');
-xlabel('lambda');
-ylabel('loss');
+% lambdaValues = [0 0.0001 0.0003 0.001 0.003 0.01 0.03 0.1 0.3 1 3 10 30 100];
+% trainLoss = [];
+% valLoss = [];
+% testLoss = [];
+% for lambda = lambdaValues  % visualize results using different lambdas
+%     [theta, costHistory] = gradientDescent(Xtrain, ytrain, initialTheta, alpha, lambda, n_iters, true);
+%     trainLoss = [trainLoss, logCost(Xtrain, theta, ytrain, 0)]; % use lambda=0 here because we want the bare cost
+%     valLoss = [valLoss, logCost(Xval, theta, yval, 0)]; % dito
+%     testLoss = [testLoss, logCost(Xtest, theta, ytest, 0)]; % dito
+% end
+% figure;
+% plot(lambdaValues, trainLoss, lambdaValues, valLoss, lambdaValues, testLoss);
+% legend('Training loss', 'Validation loss', 'Test loss');
+% title('Choosing lambda');
+% xlabel('lambda');
+% ylabel('loss');
 
 %% fit model using best parameters and evaluate it
 lambda = 0; % regularization parameter, set according to best lambda found in plot before
