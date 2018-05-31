@@ -13,4 +13,7 @@ for i = 1:N
     end
 end
 
+centroids = bestCentroids;
+idx = bestIdx;
+
 end

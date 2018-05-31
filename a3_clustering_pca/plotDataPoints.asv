@@ -1,0 +1,17 @@
+function plotDataPoints(X, idx, K)
+%PLOTDATAPOINTS plots data points in X, coloring them so that those with the same
+%index assignments in idx have the same color
+
+n = size(X, 2)
+
+palette = hsv(K + 1);
+colors = palette(idx, :);
+
+% Plot the data
+for i = 1:n
+    for j = 1:n
+        if i != j
+            subplot(n, n, i*n + j
+scatter(X(:,1), X(:,2), 15, colors);
+
+end

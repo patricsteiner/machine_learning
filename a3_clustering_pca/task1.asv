@@ -2,22 +2,58 @@ clear ; close all; clc
 %% load & prepare data
 [features, featureTitles] = loadCSVData('house_data.csv');
 
-X = [
-    normalizeFeatures(features(:, 1:13)), ...
-    normalizeFeatures(features(:, 15:end)), ...
-    onehotEncode(features(:, 14)) %zipcode
-    ];
-X = [
-    normalizeFeatures(features(:, 13:17))
-    ];
+indexes = [1:6. 9:13, 16:19];
+X = normalizeFeatures(features(:, indexes));
+labels = featureTitles(indexes);
 
 %% find good number of clusters using elbow plot
-max_iters = 40;
+max_iters = 20;
 cost_history = [];
 N = 20;
-for K = 1:15
+for K = 2:20
     [centroids, y, cost] = runkMeansNtimes(X, K, N, max_iters, false);
     cost_history = [cost_history, cost];
 end
 
-plot(1:15, cost_history)
+plot(2:20, cost_history)
+title('elbow plot of kmeans algorithm')
+xlabel('number of clusters')
+ylabel('cost function (distortion)')
+
+
+%% run clsutering with K=6 and plot the cluster results
+K = 6;
+[centroids, y, cost] = runkMeansNtimes(X, K, N, max_iters, false);
+
+palette = hsv(K + 1);
+colors = palette(y, :);
+% Plot some example data
+scatter(X(:, 1), X(:, 2), 10, colors, 'filled');
+title('clustering result');
+xlabel(labels(1));
+ylabel(labels(2));
+figure;
+scatter(X(:, 2), X(:, 3), 10, colors, 'filled');
+title('clustering result');
+xlabel(labels(2));
+ylabel(labels(3));
+figure;
+scatter(X(:, 2), X(:, 4), 10, colors, 'filled');
+title('clustering result');
+xlabel(labels(2));
+ylabel(labels(4));
+figure;
+scatter3(X(:, 12), X(:, 13), X(:, 1), 10, colors, 'filled');
+title('clustering result');
+xlabel(labels(12));
+ylabel(labels(13));
+zlabel(labels(1));
+
+
+%% characterize clusters by analysing the variance per feature
+for k = 1:K
+    variance = var(X(y==k, :));
+    sprintf('cluster %d variances:')
+    for i = 1:numel(labels)
+        sprintf('\t%s\
+end

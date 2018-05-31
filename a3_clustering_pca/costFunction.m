@@ -3,11 +3,8 @@ function cost = costFunction(X, y, centroids)
 
 m = size(X, 1);
 
-cost = 0;
-for i = 1:m
-    distance = sum((X(i, :) - centroids(y(i))).^2);
-    cost = cost + 1/m * distance;
-end
+diff = X - centroids(y, :);
+cost = 1/m * sum(sum(diff.^2, 2));
 
 end
 
