@@ -20,6 +20,27 @@ title('elbow plot of kmeans algorithm')
 xlabel('number of clusters')
 ylabel('cost function (distortion)')
 
+%% use silhouette plot and values to find best number of clsuters
+% according to the elbow plot, values around 6 seem to be a good choice.
+% Therefore, further investigate values between 4 and 9 further.
+mean_silhouette_history = [];
+for K = 5:9
+    [centroids, y, cost] = runkMeansNtimes(X, K, N, max_iters, false);
+    figure;
+    [sil, ~] = silhouette(X, y);
+    title(sprintf('silhouette plot for K=%d', K));
+    mean_silhouette_history = [mean_silhouette_history, mean(sil)];
+end
+
+plot(5:9, mean_silhouette_history)
+title('mean silhouette values vs. K')
+xlabel('number of clusters')
+ylabel('mean silhouette value')
+
+%% test
+[centroids, y, cost] = runkMeansNtimes(X, 30, 3, 10, false);
+s = silhouette(X, y);
+title(sprintf('silhouette plot for K=%d', 30));
 
 %% run clsutering with K=6 and plot the cluster results
 K = 6;
@@ -49,11 +70,15 @@ xlabel(labels(12));
 ylabel(labels(13));
 zlabel(labels(1));
 
-
 %% characterize clusters by analysing the variance per feature
 for k = 1:K
-    variance = var(X(y==k, :));
-    sprintf('cluster %d variances:')
-    for i = 1:numel(labels)
-        sprintf('\t%s\
+    cluster_size = sum(y==k) / size(X, 1);
+    vars = var(X(y==k, :));
+    means = mean(X(y==k, :));
+    [~, indices] = sort(variance);
+    fprintf('cluster %d contains %d\% of the datapoints:\n', k, cluster_size*100);
+    for i = indices
+        fprintf('\t%-15s: var=%.2f\tmean=%.2f\n', labels{i}, vars(i), means(i));
+    end
+    fprintf('\n');
 end
