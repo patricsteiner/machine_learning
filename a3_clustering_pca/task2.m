@@ -6,15 +6,29 @@ indexes = [1:6. 9:13, 16:19]; % selection of features, avoiding categorical
 X = normalizeFeatures(features(:, indexes));
 labels = featureTitles(indexes);
 
+%% reduce dimensionality using pca
+[U, S] = pca(X);
+
+n_components = 3;
+Z = projectData(X, U, n_components);
+
+figure;
+scatter3(X(:, 1), X(:, 2), X(:, 3), 'b.');
+title('X projected on first 3 PCs');
+xlabel('component 1');
+ylabel('component 2');
+zlabel('component 3');
+
 %% find good number of clusters using elbow plot
 max_iters = 20;
 cost_history = [];
 N = 20;
 for K = 2:20
-    [centroids, y, cost] = runkMeansNtimes(X, K, N, max_iters, false);
+    [centroids, y, cost] = runkMeansNtimes(Z, K, N, max_iters, false);
     cost_history = [cost_history, cost];
 end
 
+figure;
 plot(2:20, cost_history)
 title('elbow plot of kmeans algorithm')
 xlabel('number of clusters')
@@ -22,16 +36,17 @@ ylabel('cost function (distortion)')
 
 %% use silhouette plot and values to find best number of clsuters
 % according to the elbow plot, values around 6 seem to be a good choice.
-% Therefore, further investigate values between 4 and 9 further.
+% Therefore, further investigate values between 5 and 9 further.
 mean_silhouette_history = [];
 for K = 5:9
-    [centroids, y, cost] = runkMeansNtimes(X, K, N, max_iters, false);
+    [centroids, y, cost] = runkMeansNtimes(Z, K, N, max_iters, false);
     figure;
-    [sil, ~] = silhouette(X, y);
+    [sil, ~] = silhouette(Z, y);
     title(sprintf('silhouette plot for K=%d', K));
     mean_silhouette_history = [mean_silhouette_history, mean(sil)];
 end
 
+figure;
 plot(5:9, mean_silhouette_history)
 title('mean silhouette values vs. K')
 xlabel('number of clusters')
@@ -39,11 +54,19 @@ ylabel('mean silhouette value')
 
 %% run clsutering with K=7 and plot the cluster results
 K = 7;
-[centroids, y, cost] = runkMeansNtimes(X, K, N, max_iters, false);
+[centroids, y, cost] = runkMeansNtimes(Z, K, N, max_iters, false);
 
 palette = hsv(K + 1);
 colors = palette(y, :);
-% Plot some example data
+
+scatter3(Z(:, 1), Z(:, 2), Z(:, 3), 10, colors, 'filled');
+title('Clsutering result on first 3 PCs');
+xlabel('component 1');
+ylabel('component 2');
+zlabel('component 3');
+
+% Plot some example data (just for completeness' sake and comparison to
+% previous task)
 scatter(X(:, 1), X(:, 2), 10, colors, 'filled');
 title('clustering result');
 xlabel(labels(1));
