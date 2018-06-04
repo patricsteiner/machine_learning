@@ -54,7 +54,7 @@ ylabel('mean silhouette value')
 
 %% run clsutering with K=7 and plot the cluster results
 K = 7;
-[centroids, y, cost] = runkMeansNtimes(Z, K, N, max_iters, false);
+[centroids, y, cost] = runkMeansNtimes(Z, K, 1, max_iters, false);
 
 palette = hsv(K + 1);
 colors = palette(y, :);
